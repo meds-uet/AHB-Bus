@@ -9,14 +9,14 @@ module ahb_master (
     input logic Hresetn,
 
     // Processor input signals
-    input logic Pdata,
-    input logic Paddr,
-    input logic Psize,
-    input logic Pstrb,
+    input logic [DATA_WIDTH-1:0] Pwdata,
+    input logic [DATA_WIDTH-1:0] Paddr,
+    input logic [2:0] Psize,
+    input logic [DATA_WIDTH/8-1:0] Pstrb,
     input logic Pload,
     input logic Pstore,
-    input logic Pburst,
-    input logic Ptrans,
+    input logic [2:0] Pburst,
+    input logic [1:0] Ptrans,
 
     // Slave Response
     input logic Hready,
@@ -34,39 +34,50 @@ module ahb_master (
     output logic [2:0] Hburst,
     output logic [2:0] Hsize,
     output logic [1:0] Htrans,
-    output logic Hstrb,
-
+    output logic [DATA_WIDTH/8-1:0] Hstrb,
+    output logic Hreq,
+    output logic [DATA_WIDTH-1:0] Prdata,
 
     // Write Bus Data
     output logic [DATA_WIDTH-1:0] HWdata
 
 );
 
+logic addr_put;
+logic data_put;
+
 typedef enum logic [1:0] {
     IDLE,
-    ADDRESS,
-    WRITE,
-    READ,
+    REQUEST,
+    ADDR_PHASE,
+    DATA_PHASE
 } state_t;
 
 state_t C_state, N_state;
 
-always_ff @(posedge Hclk) begin
+always_ff @(posedge Hclk or negedge Hresetn) begin
 
     if (!Hresetn) begin
-        // Reset all outputs
-        Haddr <= 0;
-        Hburst <= 0;
-        Hsize <= 0;
-        Htrans <= 0;
-        HWrite <= 0;
-        HWdata <= 0;
-        Hstrb <= 0;
-
         C_state <= IDLE;
+        Htrans <= 2'b00;
+        Hreq <= 1'b0;
 
     end else begin
         C_state <= N_state;
+
+        if (addr_put) begin
+            Haddr <= Paddr;
+            Hsize <= Psize;
+            Hburst <= 3'b000;
+            Htrans <= 2'b10;
+            Hstrb <= Pstrb;
+            HWrite <= Pstore; // Write if store, else read
+        end
+        if (data_put) begin
+            if (Pstore) HWdata <= Pwdata; // Store data to write bus
+            if (Pload) Prdata <= HRdata; // Load data from read bus
+        end
+
     end
 
 end
@@ -74,62 +85,43 @@ end
 always_comb begin
     // Default values
     N_state = C_state;
-    Haddr = 0;
-    Hburst = 0;
-    Hsize = 0;
-    Htrans = 0;
-    HWrite = 0;
-    HWdata = 0;
-    Hstrb = 0;
+    addr_put = 1'b0;
+    data_put = 1'b0;
+end
+
+always_comb begin
 
     case (C_state)
+
         IDLE: begin
-            if (Pload && Hgrant) begin
-                N_state = ADDRESS;
-                Haddr = Paddr; // Set address for read
-                Htrans = Ptrans; // Non-sequential transfer
-                Hburst = Pburst; // Set burst type
-            end else if (Pstore && Hgrant) begin
-                N_state = ADDRESS;
-                Haddr = Paddr; // Set address for write
-                Htrans = Ptrans; // Non-sequential transfer
-                HWrite = 1; // Indicate write operation
+            if (Pload || Pstore)  begin
+                Hreq = 1'b1; // Assert request to the arbiter
+                N_state = REQUEST;
             end
         end
 
-        ADDRESS: begin
-            if (Hready) begin
-                if (Pload) begin
-                    N_state = READ; // Move to read state
-                    Hsize = Psize; // Set size for read operation
-                end else if (Pstore) begin
-                    N_state = WRITE; // Move to write state
-                    Hsize = Psize; // Set size for write operation
-                    HWdata = Pdata; // Load data to write bus
-                    Hstrb = Pstrb; // Set byte enable for write
-                end
+        REQUEST: begin
+            Hreq = 1'b1; // Keep assert request after entering REQUEST state
+            if (Hgrant) begin
+                N_state = ADDR_PHASE;
+                Hreq = 1'b0; // Deassert request once granted
+            end
+        end
+        ADDR_PHASE: begin
+            if (Hgrant && Hready) begin
+                addr_put = 1'b1;
+                N_state = DATA_PHASE;
             end else begin
-                N_state = IDLE; // Go back to idle if not ready
+                addr_put = 1'b0;
             end
         end
-
-        WRITE: begin
-            if (Hready) begin
-                N_state = IDLE; // Go back to idle after write operation
-            end else begin
-                N_state = WRITE; // Stay in write state until ready
+        DATA_PHASE: begin
+            if (Hgrant && Hready) begin
+                data_put = 1'b1;
+                addr_put = 1'b1;
+                N_state = IDLE;
             end
         end
-
-        READ: begin
-            if (Hready) begin
-                N_state = IDLE; // Go back to idle after read operation
-            end else begin
-                N_state = READ; // Stay in read state until ready
-            end
-        end
-
-        default: N_state = IDLE; // Fallback to idle state
 
     endcase
 
