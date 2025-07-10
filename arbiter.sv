@@ -18,10 +18,12 @@ module ahb_arbiter (
     logic [1:0] current_master;
     logic [1:0] next_master;
     logic [3:0] grant;
+    logic pre_grant_condition;
 
     logic [4:0] burst_counter;      // Max 16 beats (fits in 5 bits)
     logic       in_burst;           // Active burst flag
     logic       is_incr;            // INCR burst flag
+    logic       valid_transfer;     // Valid transfer condition
 
     // === Burst length decoding ===
     function automatic logic [4:0] burst_length(input logic [2:0] hburst);
@@ -43,6 +45,27 @@ module ahb_arbiter (
         return last;
     endfunction
 
+    // === Next Master Pre-Grant ===
+    always_comb begin
+        // Predict next master while current is active
+        next_master = get_next_master(HREQ, current_master);
+
+        // Pre-grant next master 1 beat early (if burst about to end)
+        pre_grant_condition = 0;
+        if (in_burst) begin
+            pre_grant_condition = (
+                (!is_incr && burst_counter == 1) ||             // Fixed burst
+                (is_incr && !HREQ[current_master])              // INCR ends
+            );
+        end
+
+        grant = 4'b0000;
+        if (pre_grant_condition)
+            grant[next_master] = 1;
+        else
+            grant[current_master] = 1;
+    end
+
     // === Main Arbiter FSM ===
     always_ff @(posedge HCLK or negedge HRESETn) begin
         if (!HRESETn) begin
@@ -52,7 +75,7 @@ module ahb_arbiter (
             is_incr         <= 0;
         end else begin
             // Check for valid transfer
-            logic valid_transfer = HREADY && (HTRANS == NONSEQ || HTRANS == SEQ);
+            valid_transfer = HREADY && (HTRANS == NONSEQ || HTRANS == SEQ);
 
             // Start of a burst
             if (!in_burst && valid_transfer && HREQ[current_master]) begin
@@ -74,27 +97,6 @@ module ahb_arbiter (
                 end
             end
         end
-    end
-
-    // === Next Master Pre-Grant ===
-    always_comb begin
-        // Predict next master while current is active
-        next_master = get_next_master(HREQ, current_master);
-
-        // Pre-grant next master 1 beat early (if burst about to end)
-        logic pre_grant_condition = 0;
-        if (in_burst) begin
-            pre_grant_condition = (
-                (!is_incr && burst_counter == 1) ||             // Fixed burst
-                (is_incr && !HREQ[current_master])              // INCR ends
-            );
-        end
-
-        grant = 4'b0000;
-        if (pre_grant_condition)
-            grant[next_master] = 1;
-        else
-            grant[current_master] = 1;
     end
 
     // === Outputs ===
