@@ -51,6 +51,8 @@ module tb_ahb_arbiter;
         // === Master 0: Fixed 4-beat burst ===
         @(posedge HCLK);
         HREQ[0]   = 1;
+        wait (HGRANT[0] == 1); // Wait for grant
+        @(posedge HCLK);
         HBURST    = 3'b011;     // INCR4
         HTRANS    = 2'b10;      // NONSEQ
 
@@ -65,6 +67,8 @@ module tb_ahb_arbiter;
         // === Master 1: INCR burst that ends manually ===
         @(posedge HCLK);
         HREQ[1]   = 1;
+        wait (HGRANT[1] == 1); // Wait for grant
+        @(posedge HCLK);
         HBURST    = 3'b001;     // INCR
         HTRANS    = 2'b10;      // NONSEQ
 
@@ -82,6 +86,8 @@ module tb_ahb_arbiter;
         // === Master 3: INCR4 burst ===
         @(posedge HCLK);
         HREQ[3]   = 1;
+        wait (HGRANT[3] == 1); // Wait for grant
+        @(posedge HCLK);
         HBURST    = 3'b011;     // INCR4
         HTRANS    = 2'b10;
 
