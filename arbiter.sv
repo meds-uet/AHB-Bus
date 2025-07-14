@@ -1,13 +1,13 @@
 module ahb_arbiter (
-    input  logic         HCLK,
-    input  logic         HRESETn,
-    input  logic [3:0]   HREQ,       // Master requests
-    input  logic         HREADY,     // Global HREADY
-    input  logic [1:0]   HTRANS,     // Transaction type
-    input  logic [2:0]   HBURST,     // Burst type
+    input  logic         Hclk,
+    input  logic         Hresetn,
+    input  logic [3:0]   Hreq,       // Master requests
+    input  logic         Hready,     // Global Hready
+    input  logic [1:0]   Htrans,     // Transaction type
+    input  logic [2:0]   Hburst,     // Burst type
 
-    output logic [3:0]   HGRANT,     // Grant signal to masters
-    output logic [1:0]   HMASTER     // Index of active master
+    output logic [3:0]   Hgrant,     // Grant signal to masters
+    output logic [1:0]   Hmaster     // Index of active master
 );
 
     localparam IDLE   = 2'b00;
@@ -50,22 +50,22 @@ module ahb_arbiter (
 
     always_comb begin
         ready_for_handover = (!in_burst) || 
-                             (!is_incr && burst_counter == 0 && HREADY) ||
-                             (is_incr && !HREQ[current_master] && HREADY);
+                             (!is_incr && burst_counter == 0 && Hready) ||
+                             (is_incr && !Hreq[current_master] && Hready);
     end
 
     // === Grant decision ===
     always_comb begin
-        next_master     = get_next_master(HREQ, current_master);
+        next_master     = get_next_master(Hreq, current_master);
         granted_master  = ready_for_handover ? next_master : current_master;
 
-        HGRANT = 4'b0000;
-        HGRANT[granted_master] = 1;
+        Hgrant = 4'b0000;
+        Hgrant[granted_master] = 1;
     end
 
     // === FSM and burst tracking ===
-    always_ff @(posedge HCLK or negedge HRESETn) begin
-        if (!HRESETn) begin
+    always_ff @(posedge Hclk or negedge Hresetn) begin
+        if (!Hresetn) begin
             current_master <= 2'd0;
             burst_counter  <= 0;
             in_burst       <= 0;
@@ -73,21 +73,19 @@ module ahb_arbiter (
         end else begin
             current_master <= granted_master;
 
-            valid_transfer = HREADY && (HTRANS == NONSEQ || HTRANS == SEQ);
+            valid_transfer = Hready && (Htrans == NONSEQ || Htrans == SEQ);
 
             // Start of burst
-            if (!in_burst && valid_transfer && HREQ[current_master]) begin
+            if (!in_burst && valid_transfer && Hreq[current_master]) begin
                 in_burst      <= 1;
-                is_incr       <= (HBURST == 3'b001); // INCR
-                burst_counter <= (HBURST == 3'b001) ? 0 : burst_length(HBURST) - 1;
+                is_incr       <= (Hburst == 3'b001); // INCR
+                burst_counter <= (Hburst == 3'b001) ? 0 : burst_length(Hburst) - 1;
             end
             // During burst
             else if (in_burst && valid_transfer) begin
                 if (!is_incr && burst_counter != 0)
                     burst_counter <= burst_counter - 1;
-
-                if ((!is_incr && burst_counter == 0) ||
-                    (is_incr && !HREQ[current_master])) begin
+                    (is_incr && !Hreq[current_master])) begin
                     in_burst <= 0;
                 end
             end
@@ -95,6 +93,7 @@ module ahb_arbiter (
     end
 
     // === Output active master ===
-    assign HMASTER = current_master;
+    assign Hmaster = current_master;
 
 endmodule
+
