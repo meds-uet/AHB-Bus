@@ -22,31 +22,32 @@ module ahb_arbiter (
     logic [4:0] burst_counter;
     logic       in_burst;
     logic       is_incr;
-	logic       valid_transfer;
+    logic       valid_transfer;
 
-    // === Burst length decoding ===
-    function automatic logic [4:0] burst_length(input logic [2:0] hburst);
-        case (hburst)
-            3'b000: return 5'd1;    // SINGLE
-            3'b010, 3'b011: return 5'd4;    // WRAP4 / INCR4
-            3'b100, 3'b101: return 5'd8;    // WRAP8 / INCR8
-            3'b110, 3'b111: return 5'd16;   // WRAP16 / INCR16
-            default: return 5'd0;           // INCR or undefined
-        endcase
-    endfunction
-
-    // === Round-robin master selection ===
-    function automatic logic [1:0] get_next_master(input logic [3:0] req, input logic [1:0] last);
-        for (int i = 1; i <= 4; i++) begin
-            int idx = (last + i) % 4;
-            if (req[idx])
-                return idx[1:0];
-        end
-        return last;
-    endfunction
-
-    // === Handover condition ===
     logic ready_for_handover;
+    logic [1:0] idx;
+
+    // Burst length decoding
+    logic [4:0] burst_len;
+    always_comb begin
+        case (Hburst)
+            3'b000: burst_len = 5'd1;    // SINGLE
+            3'b010, 3'b011: burst_len = 5'd4;    // WRAP4 / INCR4
+            3'b100, 3'b101: burst_len = 5'd8;    // WRAP8 / INCR8
+            3'b110, 3'b111: burst_len = 5'd16;   // WRAP16 / INCR16
+            default: burst_len = 5'd0;           // INCR or undefined
+        endcase
+    end
+
+    // Round-robin master selection
+    always_comb begin
+        next_master = current_master;
+        for (int i = 1; i <= 4; i++) begin
+            idx = (current_master + i) % 4;
+            if (Hreq[idx])
+                next_master = idx[1:0];
+        end
+    end
 
     always_comb begin
         ready_for_handover = (!in_burst) || 
@@ -54,16 +55,15 @@ module ahb_arbiter (
                              (is_incr && !Hreq[current_master] && Hready);
     end
 
-    // === Grant decision ===
+    // Grant decision
     always_comb begin
-        next_master     = get_next_master(Hreq, current_master);
         granted_master  = ready_for_handover ? next_master : current_master;
 
         Hgrant = 4'b0000;
         Hgrant[granted_master] = 1;
     end
 
-    // === FSM and burst tracking ===
+    // FSM and burst tracking
     always_ff @(posedge Hclk or negedge Hresetn) begin
         if (!Hresetn) begin
             current_master <= 2'd0;
@@ -79,7 +79,7 @@ module ahb_arbiter (
             if (!in_burst && valid_transfer && Hreq[current_master]) begin
                 in_burst      <= 1;
                 is_incr       <= (Hburst == 3'b001); // INCR
-                burst_counter <= (Hburst == 3'b001) ? 0 : burst_length(Hburst) - 1;
+                burst_counter <= (Hburst == 3'b001) ? 0 : burst_len - 1;
             end
             // During burst
             else if (in_burst && valid_transfer) begin
@@ -94,7 +94,7 @@ module ahb_arbiter (
         end
     end
 
-    // === Output active master ===
+    // Output active master
     assign Hmaster = current_master;
 
 endmodule
