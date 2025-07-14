@@ -43,7 +43,7 @@ module ahb_arbiter (
     always_comb begin
         next_master = current_master;
         for (int i = 1; i <= 4; i++) begin
-            idx = (current_master + i) % 4;
+            idx = (current_master + i < 4) ? (current_master + i) : (current_master + i - 4);
             if (Hreq[idx])
                 next_master = idx[1:0];
         end
