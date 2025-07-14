@@ -22,7 +22,7 @@ module ahb_arbiter (
     logic [4:0] burst_counter;
     logic       in_burst;
     logic       is_incr;
-    logic       valid_transfer;
+	logic       valid_transfer;
 
     // === Burst length decoding ===
     function automatic logic [4:0] burst_length(input logic [2:0] hburst);
@@ -85,6 +85,8 @@ module ahb_arbiter (
             else if (in_burst && valid_transfer) begin
                 if (!is_incr && burst_counter != 0)
                     burst_counter <= burst_counter - 1;
+
+                if ((!is_incr && burst_counter == 0) ||
                     (is_incr && !Hreq[current_master])) begin
                     in_burst <= 0;
                 end
