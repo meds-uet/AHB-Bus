@@ -48,59 +48,32 @@ module tb_ahb_arbiter;
         repeat (3) @(posedge Hclk);
         Hresetn = 1;
 
-        // === Master 0: Fixed 4-beat burst ===
+        // === All masters request at the same time ===
         @(posedge Hclk);
-        Hreq[0]   = 1;
-        wait (Hgrant[0] == 1); // Wait for grant
-        @(posedge Hclk);
-        Hburst    = 3'b011;     // INCR4
-        Htrans    = 2'b10;      // NONSEQ
+        Hreq = 4'b1111; // All request
+        Hburst = 3'b011; // INCR4
 
+
+        Htrans = 2'b10;  // NONSEQ
         repeat (1) @(posedge Hclk);
-        Htrans = 2'b11;         // SEQ
-        repeat (3) @(posedge Hclk); // 3 remaining beats
-
-        // Burst ends
-        Htrans = 2'b00;
-        Hreq[0] = 0;
-
-        // === Master 1: INCR burst that ends manually ===
-        @(posedge Hclk);
-        Hreq[1]   = 1;
-        wait (Hgrant[1] == 1); // Wait for grant
-        @(posedge Hclk);
-        Hburst    = 3'b001;     // INCR
-        Htrans    = 2'b10;      // NONSEQ
-
-        repeat (1) @(posedge Hclk);
-        Htrans = 2'b11;         // SEQ
+        Htrans = 2'b11; // SEQ
         repeat (4) @(posedge Hclk);
 
-        // Manually deassert Hreq
-        Hreq[1] = 0;
-        Htrans  = 2'b00;
-
-        // === Master 2: No request (idle cycle) ===
-        repeat (2) @(posedge Hclk);
-
-        // === Master 3: INCR4 burst ===
-        @(posedge Hclk);
-        Hreq[3]   = 1;
-        wait (Hgrant[3] == 1); // Wait for grant
-        @(posedge Hclk);
-        Hburst    = 3'b011;     // INCR4
-        Htrans    = 2'b10;
-
+        Htrans = 2'b10;  // NONSEQ
         repeat (1) @(posedge Hclk);
-        Htrans = 2'b11;
-        repeat (3) @(posedge Hclk);
+        Htrans = 2'b11; // SEQ
+        repeat (4) @(posedge Hclk);
 
-        Hreq[3] = 0;
-        Htrans = 2'b00;
+        Htrans = 2'b10;  // NONSEQ
+        repeat (1) @(posedge Hclk);
+        Htrans = 2'b11; // SEQ
+        repeat (4) @(posedge Hclk);
 
-        // End simulation
-        repeat (10) @(posedge Hclk);
-        $finish;
+        
+
+        
+        
+        $stop;
     end
 
 endmodule

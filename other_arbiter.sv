@@ -71,7 +71,6 @@ module ahb_arbiter (
             in_burst       <= 0;
             is_incr        <= 0;
         end else begin
-                
             current_master <= granted_master;
 
             valid_transfer = Hready && (Htrans == NONSEQ || Htrans == SEQ);
@@ -83,16 +82,13 @@ module ahb_arbiter (
                 burst_counter <= (Hburst == 3'b001) ? 0 : burst_len - 1;
             end
             // During burst
-            else if (in_burst) begin
-                // For INCR, clear in_burst if master drops request
-                if (is_incr && !Hreq[current_master])
+            else if (in_burst && valid_transfer) begin
+                if (!is_incr && burst_counter != 0)
+                    burst_counter <= burst_counter - 1;
+
+                if ((!is_incr && burst_counter == 0) ||
+                    (is_incr && !Hreq[current_master])) begin
                     in_burst <= 0;
-                // For non-INCR, decrement burst_counter on valid transfer
-                else if (!is_incr && valid_transfer) begin
-                    if (burst_counter != 0)
-                        burst_counter <= burst_counter - 1;
-                    if (burst_counter == 0)
-                        in_burst <= 0;
                 end
             end
         end
