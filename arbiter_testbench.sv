@@ -68,6 +68,21 @@ module tb_ahb_arbiter;
         repeat (1) @(posedge Hclk);
         Htrans = 2'b11; // SEQ
         repeat (4) @(posedge Hclk);
+        
+        Htrans = 2'b10;  // NONSEQ
+        repeat (1) @(posedge Hclk);
+        Htrans = 2'b11; // SEQ
+        repeat (4) @(posedge Hclk);
+
+        Htrans = 2'b10;  // NONSEQ
+        repeat (1) @(posedge Hclk);
+        Htrans = 2'b11; // SEQ
+        repeat (4) @(posedge Hclk);
+
+        Htrans = 2'b10;  // NONSEQ
+        repeat (1) @(posedge Hclk);
+        Htrans = 2'b11; // SEQ
+        repeat (4) @(posedge Hclk);
 
         
 
