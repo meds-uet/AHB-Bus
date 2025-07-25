@@ -34,7 +34,7 @@ module tb_ahb_arbiter;
 
     // Simulation logic
     initial begin
-        $dumpfile("ahb_arbiter.vcd");
+        $dumpfile("sim.vcd");
         $dumpvars(0, tb_ahb_arbiter);
 
         // Initialize
@@ -73,7 +73,7 @@ module tb_ahb_arbiter;
 
         
         
-        $stop;
+        $finish;
     end
 
 endmodule
