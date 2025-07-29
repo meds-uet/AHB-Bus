@@ -10,25 +10,11 @@
 // Author: Muhammad Yousaf and Ali Tahir
 // Date:   29-July-2025
 
+`include "../defines/header.svh"
+import param_pkg::*;
 
 
-module decoder #(
-    parameter NUM_SLAVES = 4,
-    parameter ADDR_WIDTH = 32,
-
-    parameter logic [ADDR_WIDTH-1:0] BASE_ADDR [0:NUM_SUBORD-1] = '{
-        32'h0000_0000,
-        32'hEEEE_0000,
-        32'hFFFF_0000
-    },
-
-    parameter logic [ADDR_WIDTH-1:0] HIGH_ADDR [0:NUM_SUBORD-1] = '{
-        32'hEEEE_0000,
-        32'hFFFF_0000,
-        32'hFFFF_FFFF
-    }
-
-) (
+module decoder (
     input logic [ADDR_WIDTH-1:0] Haddr,
 
     output logic [NUM_SUBORD-1:0] Hsel

@@ -11,16 +11,12 @@
 // Author: Muhammad Yousaf and Ali Tahir
 // Date:   29-July-2025
 
+`include "../defines/header.svh"
+import param_pkg::*;
 
 
+module slave_to_master_mux (
 
-module slave_to_master_mux #(
-
-    parameter integer NUM_SLAVES = 4,
-    parameter DATA_WIDTH = 32,
-    parameter ADDR_WIDTH = 32
-
-) (
     input  logic                        Hclk,
     input  logic                        Hresetn,
     input  logic [NUM_SLAVES-1:0]       slave_select,         // One-hot signal from decoder
@@ -31,6 +27,7 @@ module slave_to_master_mux #(
     output logic [DATA_WIDTH-1:0]       Hrdata,
     output logic [1:0]                  Hresp,
     output logic                        Hready                // Global Hready for master
+
 );
 
     // Register selected slave (for pipelined response)

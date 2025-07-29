@@ -11,12 +11,10 @@
 
 
 
-module ahb_slave_wrapper #(
+`include "../defines/header.svh"
+import param_pkg::*;
 
-    parameter DATA_WIDTH = 32,
-    parameter ADDR_WIDTH = 32
-
-) (
+module ahb_slave_wrapper (
 
     input                              Hclk,
     input                              Hresetn,

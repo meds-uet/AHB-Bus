@@ -12,14 +12,10 @@
 // Date:   29-July-2025
 
 
+`include "../defines/header.svh"
+import param_pkg::*;
 
-module master_to_slave_mux #(
-
-    parameter integer NUM_MASTERS = 4,
-    parameter DATA_WIDTH = 32,
-    parameter ADDR_WIDTH = 32
-
-) (
+module master_to_slave_mux (
 
     input  logic [1:0]                      Hmaster,   // Selected master index
     input  logic [DATA_WIDTH-1:0]           Haddr_M  [NUM_MASTERS],
