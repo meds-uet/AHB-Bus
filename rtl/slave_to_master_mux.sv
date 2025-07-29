@@ -1,3 +1,19 @@
+// Copyright 2025 Maktab-e-Digital Systems Lahore.
+// Licensed under the Apache License, Version 2.0, see LICENSE file for details.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Description: 
+// 
+// This module is the slave to master multiplexer for AHB bus.
+// That uses the slected slave signal form the Decoder module.
+// To derive the DATA and RESPONSE SIGNAL on the bus.
+//
+// Author: Muhammad Yousaf and Ali Tahir
+// Date:   29-July-2025
+
+
+
+
 module slave_to_master_mux #(
 
     parameter integer NUM_SLAVES = 4,
