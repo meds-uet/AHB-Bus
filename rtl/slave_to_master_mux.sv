@@ -43,26 +43,13 @@ module slave_to_master_mux (
     // Output MUX
     always_comb begin
         case (1'b1)
-            selected_slave[0]: begin
-                Hrdata = Hrdata_S[0];
-                Hresp  = Hresp_S[0];
-                Hready = Hreadyout_S[0];
+        for (int i = 0; i < NUM_SLAVES; i++) begin
+            selected_slave[i]: begin
+                Hrdata = Hrdata_S[i];
+                Hresp  = Hresp_S[i];
+                Hready = Hreadyout_S[i];
             end
-            selected_slave[1]: begin
-                Hrdata = Hrdata_S[1];
-                Hresp  = Hresp_S[1];
-                Hready = Hreadyout_S[1];
-            end
-            selected_slave[2]: begin
-                Hrdata = Hrdata_S[2];
-                Hresp  = Hresp_S[2];
-                Hready = Hreadyout_S[2];
-            end
-            selected_slave[3]: begin
-                Hrdata = Hrdata_S[3];
-                Hresp  = Hresp_S[3];
-                Hready = Hreadyout_S[3];
-            end
+        end
             default: begin
                 Hrdata = 32'hDEADBEEF;
                 Hresp  = 2'b00;
