@@ -14,7 +14,7 @@
 
 # Documentation
 
-Documentation Status
+[![Documentation Status]](https://ahb-bus-protocol.readthedocs.io/en/latest/)
 
 # Licensing
 
