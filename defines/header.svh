@@ -17,13 +17,13 @@ package param_pkg;
     parameter int DATA_WIDTH = 32;
     parameter int ADDR_WIDTH = 32;
 
-    parameter logic [ADDR_WIDTH-1:0] BASE_ADDR [0:NUM_SUBORD-1] = '{
+    parameter logic [ADDR_WIDTH-1:0] BASE_ADDR [0:NUM_SLAVES-1] = '{
         32'h0000_0000,
         32'hEEEE_0000,
         32'hFFFF_0000
     },
 
-    parameter logic [ADDR_WIDTH-1:0] HIGH_ADDR [0:NUM_SUBORD-1] = '{
+    parameter logic [ADDR_WIDTH-1:0] HIGH_ADDR [0:NUM_SLAVES-1] = '{
         32'hEEEE_0000,
         32'hFFFF_0000,
         32'hFFFF_FFFF
