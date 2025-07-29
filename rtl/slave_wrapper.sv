@@ -16,20 +16,20 @@ import param_pkg::*;
 
 module ahb_slave_wrapper (
 
-    input                              Hclk,
-    input                              Hresetn,
-    input  [ADDR_WIDTH-1:0]            Haddr,
-    input  [1:0]                       Htrans,
-    input                              Hwrite,
-    input  [2:0]                       Hsize,
-    input  [2:0]                       Hburst,
-    input  [DATA_WIDTH-1:0]            HWdata,
-    input  [DATA_WIDTH/8-1:0]          Hstrob,
-    input                              Hsel,
-    input                              Hready,
-    output [DATA_WIDTH-1:0]            HRdata,
-    output                             Hreadyout,
-    output [1:0]                       Hresp
+    input  logic                             Hclk,
+    input  logic                             Hresetn,
+    input  logic [ADDR_WIDTH-1:0]            Haddr,
+    input  logic [1:0]                       Htrans,
+    input  logic                             Hwrite,
+    input  logic [2:0]                       Hsize,
+    input  logic [2:0]                       Hburst,
+    input  logic [DATA_WIDTH-1:0]            HWdata,
+    input  logic [DATA_WIDTH/8-1:0]          Hstrob,
+    input  logic                             Hsel,
+    input  logic                             Hready,
+    output logic [DATA_WIDTH-1:0]            HRdata,
+    output logic                             Hreadyout,
+    output logic [1:0]                       Hresp
 
 );
 
