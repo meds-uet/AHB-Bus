@@ -8,51 +8,65 @@
 
 ---
 
-The AMBA Advanced High-performance Bus (AHB) is a bus protocol introduced by ARM ltd. for on-chip communication between components such as microprocessors, memory interfaces, and peripherals. AHB is a high-performance bus protocol and is the de facto standard for on-chip communication in the majority of modern digital design systems. The AHB protocol is a synchronous, multi-master, multi-slave bus protocol which can operate at a maximum frequency of 1 GHz.
+The AMBA Advanced High-performance Bus (AHB) is a bus protocol introduced by ARM ltd. for on-chip communication between components such as microprocessors, memory interfaces, and peripherals. AHB is a high-performance bus protocol and is the de facto standard for on-chip communication in the majority of modern digital design systems. The AHB protocol is a synchronous, multi-master, multi-slave bus protocol.
 
 ## Components of AHB
 - **Arbiter**: Manages access to the bus, ensuring that only one master can use the bus at a time.
+
 - **Master**: Initiates read and write operations by providing address and control signals.
+
 - **Slave**: Responds to master requests, providing data for read operations or receiving data for write operations.
-- **Decoder**: Determines which slave the master intends to communicate with, based on the address provided.
+
 - **Bus**: The physical interconnect that carries data, address, and control signals between components.
+
+- **Decoder**: Determines which slave the master intends to communicate with, based on the address provided.
+
 - **Master to Slave Multiplexer (MSMUX)**: A multiplexer that selects the master that is currently accessing the bus.
+
 - **Slave to Master Multiplexer (SMMUX)**: A multiplexer that selects the slave that is currently being accessed by the master.
 
 
 
-## 🔑 Main Features of AHB Bus Protocol
+## Main Features of AHB Bus Protocol
+
 The AHB Protocol Features that are supported are given as follow :
 
 
 ### ✅ 1. Single Clock Edge Operation
 - All operations are synchronized to the **rising edge** of a single system clock.
+
 - Simplifies timing analysis and enhances performance.
 
 ---
 
 ### 🚀 2. Burst Transfers
 - Supports **burst types**: `SINGLE`, `INCR`, `WRAP4`, `INCR4`, `INCR8`, `INCR16`, etc.
+
 - Improves efficiency by reducing address/control overhead during sequential data transfers.
 
 ---
 
 ### 🔁 3. Pipelined Operation
 - AHB supports pipelining with separate **address phase** and **data phase**.
+
 - Enables a new transfer to begin before the previous one completes.
+
 - Improves throughput significantly.
 
 ---
 
 ### 📥 4. Multi-Master Support
 - Supports multiple bus masters like CPU, DMA, etc.
+
 - Masters use an **arbitration mechanism** (external to AHB) to gain control of the bus.
+
 - Only one master can drive the bus at any time.
 
 ---
 
 ### 🔀 5. Address and Data Bus Multiplexing
 - AHB uses shared lines for address and data (i.e., bus multiplexing).
+
 - Reduces the number of physical signals/pins.
 
 ---
@@ -63,7 +77,8 @@ The AHB Protocol Features that are supported are given as follow :
 ---
 
 ### ❗ 7. Error Reporting via HRESP
-- The `HRESP` signal returns response status:
+The `HRESP` signal returns response status:
+
   - `OKAY` – Normal transfer
   - `ERROR` – Error occurred
 
@@ -71,11 +86,13 @@ The AHB Protocol Features that are supported are given as follow :
 
 ### 🧠 8. External Arbitration Logic
 - Arbitration between masters is handled **outside** the AHB bus.
+
 - Common schemes: fixed-priority, round-robin, or custom.
 
 ---
 
 ### 📶 9. Transfer Types
+
 - **IDLE** – No transfer
 - **BUSY** – Pipeline stall (no address phase)
 - **NONSEQ** – Start of a new transfer or burst
@@ -85,12 +102,14 @@ The AHB Protocol Features that are supported are given as follow :
 
 ### 🎯 10. Handshaking Between Master and Slave
 - `HREADY` and `HRESP` signals coordinate data transfers.
+
 - Master waits if slave is not ready.
 
 ---
 
 ### 📋 11. Memory-Mapped Support
 - AHB is designed for **memory-mapped peripheral access**.
+
 - Each device is assigned a specific address region.
 
 ---
@@ -111,9 +130,11 @@ The AHB Protocol Features that are supported are given as follow :
 | Address mapping      | Fully memory-mapped device space                 |
 
 ---
-
-## 🧠 Tip
+### 🧠 Tip
+\
 AHB sits between **APB (simple)** and **AXI (advanced)** in terms of complexity and performance.
+
+---
 
 # Component Description
 This section goes over the description of each of the components used in the AHB bus protocol.
@@ -146,3 +167,27 @@ The allocation algorithm used in the Arbiter is a Round Robin priority algorithm
 
 - If a master does not have a valid request when it is its turn, the Arbiter moves to the next highest priority master.
 
+- It allows only one burst from one master in a single request.
+
+## Bus
+
+The bus sits between the masters and slaves, responsible for connecting the correct master to the correct slave. This is the shared resource whose access is granted by the arbiter. This contains the interconnect, decoder and the arbiter.
+
+The decoder gives the appropriate signals to select which slave is active, the arbiter decides which master is active, the interconnect routes the signals from the active master to the selected slave according to the signals provided by the arbiter and decoder.
+
+
+## Decoder
+
+This module is a decoder for the AHB bus. Its main purpose is to use the address to select which slave device should be active at a given time. This is a fundamental part of bus systems, ensuring that data and commands go to the correct destination on the bus.
+
+## Master To Slave Mux
+
+The master_to_slave_mux module is a multiplexer for AHB bus systems. 
+It selects and forwards address, data, and control signals from the currently active bus master to the shared bus lines, based on an arbitration signal. 
+This ensures only one master controls the bus at any time, enabling safe and efficient multi-master communication.
+
+## Slave To Master Mux
+
+The slave_to_master_mux module implements a multiplexer that connects multiple slave devices to a single master interface on an AHB bus. 
+It selects one slave's data, response, and ready signals based on a selection input, ensuring that only the chosen slave communicates with the master at any time. 
+This is essential in bus systems to manage access when multiple devices share a communication channel.
