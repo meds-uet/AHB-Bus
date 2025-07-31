@@ -169,6 +169,16 @@ The allocation algorithm used in the Arbiter is a Round Robin priority algorithm
 
 - It allows only one burst from one master in a single request.
 
+## Slave Module
+
+This module implements a wrapper for a slave device, providing a standardized interface to the AHB bus. The module maps the input and output signals to the selected slave, allowing for easy integration with the rest of the system.
+
+### Features
+
+* Provides a standardized interface to the AHB bus
+* Maps input and output signals to the selected slave
+* Supports a single slave device
+
 ## Bus
 
 The bus sits between the masters and slaves, responsible for connecting the correct master to the correct slave. This is the shared resource whose access is granted by the arbiter. This contains the interconnect, decoder and the arbiter.
@@ -180,14 +190,32 @@ The decoder gives the appropriate signals to select which slave is active, the a
 
 This module is a decoder for the AHB bus. Its main purpose is to use the address to select which slave device should be active at a given time. This is a fundamental part of bus systems, ensuring that data and commands go to the correct destination on the bus.
 
-## Master To Slave Mux
+## Master-To-Slave Multiplexer Module
 
 The master_to_slave_mux module is a multiplexer for AHB bus systems. 
 It selects and forwards address, data, and control signals from the currently active bus master to the shared bus lines, based on an arbitration signal. 
+
 This ensures only one master controls the bus at any time, enabling safe and efficient multi-master communication.
 
-## Slave To Master Mux
+This module implements a master-to-slave multiplexer, allowing a single master interface to be connected to multiple slaves. The module is designed to distribute the master's requests to the selected slave.
+
+### Features
+
+* Supports a single master interface connected to multiple slaves
+* Parameterized to support a variable number of slaves
+* Implements a multiplexer to select the target master for the transfer.
+
+## Slave-To-Master Multiplexer Module
 
 The slave_to_master_mux module implements a multiplexer that connects multiple slave devices to a single master interface on an AHB bus. 
 It selects one slave's data, response, and ready signals based on a selection input, ensuring that only the chosen slave communicates with the master at any time. 
+
+The module is parameterized to support a variable number of slaves, making it easily configurable for different system architectures.
+
 This is essential in bus systems to manage access when multiple devices share a communication channel.
+
+### Features
+
+* Supports multiple slaves connected to a single master interface
+* Parameterized to support a variable number of slaves
+* Implements a multiplexer to select the active slave
