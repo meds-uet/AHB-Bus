@@ -20,24 +20,26 @@ module slave_to_master_mux (
     input  logic                        Hclk,
     input  logic                        Hresetn,
     input  logic [NUM_SLAVES-1:0]       slave_select,         // One-hot signal from decoder
+    input  logic [clog2(NUM_MASTERS)-1:0] Hmaster,            // Selected master index
     input  logic [DATA_WIDTH-1:0]       Hrdata_S [NUM_SLAVES],         // From slaves
     input  logic [1:0]                  Hresp_S  [NUM_SLAVES],
     input  logic                        Hreadyout_S [NUM_SLAVES],
 
-    output logic [DATA_WIDTH-1:0]       Hrdata,
-    output logic [1:0]                  Hresp,
+    output logic [DATA_WIDTH-1:0]       Hrdata [NUM_MASTERS],
+    output logic [1:0]                  Hresp [NUM_MASTERS],
     output logic                        Hready                // Global Hready for master
-
 );
 
     // Register selected slave (for pipelined response)
     logic [NUM_SLAVES-1:0] selected_slave;
+    logic [NUM_MASTERS-1:0] selected_master;
 
     always_ff @(posedge Hclk or negedge Hresetn) begin
         if (!Hresetn)
             selected_slave <= 4'b0000;
         else if (Hready) // Only update on valid transfer complete
             selected_slave <= slave_select;
+            selected_master <= Hmaster;
     end
 
     // Output MUX
@@ -45,15 +47,15 @@ module slave_to_master_mux (
         case (1'b1)
         for (int i = 0; i < NUM_SLAVES; i++) begin
             selected_slave[i]: begin
-                Hrdata = Hrdata_S[i];
-                Hresp  = Hresp_S[i];
-                Hready = Hreadyout_S[i];
+                Hrdata[selected_master] = Hrdata_S[i];
+                Hresp[selected_master]  = Hresp_S[i];
+                Hready[selected_master] = Hreadyout_S[i];
             end
         end
             default: begin
-                Hrdata = 32'hDEADBEEF;
-                Hresp  = 2'b00;
-                Hready = 1'b1; // default: no wait
+                Hrdata[selected_master] = 32'hDEADBEEF;
+                Hresp[selected_master]  = 2'b00;
+                Hready[selected_master] = 1'b1; // default: no wait
             end
         endcase
     end
