@@ -76,11 +76,7 @@ module ahb_arbiter (
     // Grant decision
     always_comb begin
 
-        if (Hburst == 3'b000) begin // For Single Transfer
-            granted_master  = (ready_for_handover && Htrans == NONSEQ) ? next_master : current_master;
-        end else begin // For Burst Transfer
-            granted_master  = (ready_for_handover && Htrans != NONSEQ) ? next_master : current_master;
-        end
+        granted_master  = (ready_for_handover && Htrans == NONSEQ) ? next_master : current_master;
 
         Hgrant = 'b0;
         Hgrant[granted_master] = 1;
