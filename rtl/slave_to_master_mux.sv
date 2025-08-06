@@ -17,17 +17,17 @@ import param_pkg::*;
 
 module slave_to_master_mux (
 
-    input  logic                        Hclk,
-    input  logic                        Hresetn,
-    input  logic [NUM_SLAVES-1:0]       slave_select,         // One-hot signal from decoder
-    input  logic [clog2(NUM_MASTERS)-1:0] Hmaster,            // Selected master index
-    input  logic [DATA_WIDTH-1:0]       Hrdata_S [NUM_SLAVES],         // From slaves
-    input  logic [1:0]                  Hresp_S  [NUM_SLAVES],
-    input  logic                        Hreadyout_S [NUM_SLAVES],
+    input  logic                            Hclk,
+    input  logic                            Hresetn,
+    input  logic [NUM_SLAVES-1:0]           slave_select,         // One-hot signal from decoder
+    input  logic [clog2(NUM_MASTERS)-1:0]   Hmaster,            // Selected master index
+    input  logic [DATA_WIDTH-1:0]           Hrdata_S [NUM_SLAVES],         // From slaves
+    input  logic [1:0]                      Hresp_S  [NUM_SLAVES],
+    input  logic                            Hreadyout_S [NUM_SLAVES],
 
-    output logic [DATA_WIDTH-1:0]       Hrdata [NUM_MASTERS],
-    output logic [1:0]                  Hresp [NUM_MASTERS],
-    output logic                        Hready                // Global Hready for master
+    output logic [DATA_WIDTH-1:0]           Hrdata [NUM_MASTERS],
+    output logic [1:0]                      Hresp [NUM_MASTERS],
+    output logic                            Hready                // Global Hready for master
 );
 
     // Register selected slave (for pipelined response)
