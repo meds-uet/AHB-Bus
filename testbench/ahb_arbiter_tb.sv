@@ -1,8 +1,17 @@
+// Copyright 2025 Maktab-e-Digital Systems Lahore.
+// Licensed under the Apache License, Version 2.0, see LICENSE file for details.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Description: 
+// This module tests the Arbiter of the AHB bus.
+//
+//
+// Author: Muhammad Yousaf and Ali Tahir
+// Date:   07-August-2025
+
 `timescale 1ns/1ps
 
-`include "../defines/header.svh"
-import param_pkg::*;
-
+`include "../defines/parameters.svh"
 
 module ahb_arbiter_tb;
 
@@ -11,14 +20,14 @@ module ahb_arbiter_tb;
     logic Hresetn;
 
     // Inputs to DUT
-    logic [NUM_MASTERS-1:0] Hreq;
+    logic [`NUM_MASTERS-1:0] Hreq;
     logic       Hready;
     logic [1:0] Htrans;
     logic [2:0] Hburst;
 
     // Outputs from DUT
-    logic [NUM_MASTERS-1:0] Hgrant;
-    logic [clog2(NUM_MASTERS)-1:0] Hmaster;
+    logic [`NUM_MASTERS-1:0] Hgrant;
+    logic [$clog2(`NUM_MASTERS)-1:0] Hmaster;
 
     // Instantiate DUT
     ahb_arbiter dut (
@@ -37,11 +46,10 @@ module ahb_arbiter_tb;
     always #5 Hclk = ~Hclk; // 100MHz
 
 
-    task single_transfer(input logic [NUM_MASTERS-1:0] req, input int mas);
+    task single_transfer(input logic [`NUM_MASTERS-1:0] req, input int mas);
         @(posedge Hclk);
         Hreq = req;
 
-        //wait (Hgrant[mas] == 1'b1);
         @(posedge Hclk);
         Htrans = 2'b10;
         Hburst = 3'b001;
@@ -50,11 +58,10 @@ module ahb_arbiter_tb;
         
     endtask
 
-    task burst_transfer(input logic [NUM_MASTERS-1:0] req, input int mas);
+    task burst_transfer(input logic [`NUM_MASTERS-1:0] req, input int mas);
         @(posedge Hclk);
         Hreq = req;
 
-        // wait (Hgrant[mas] == 1'b1);
         @(posedge Hclk);
         Htrans = 2'b10;
         Hburst = 3'b011;
