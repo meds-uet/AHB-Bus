@@ -8,16 +8,15 @@
 // This outputs the assert signal to the selected slave.
 //
 // Author: Muhammad Yousaf and Ali Tahir
-// Date:   29-July-2025
+// Date:   07-August-2025
 
-`include "../defines/header.svh"
-import param_pkg::*;
+`include "../defines/parameters.svh"
 
 
 module decoder (
-    input logic [ADDR_WIDTH-1:0] Haddr,
+    input logic [`ADDR_WIDTH-1:0] Haddr,
 
-    output logic [NUM_SLAVES-1:0] Hsel
+    output logic [`NUM_SLAVES-1:0] Hsel
 );
 
 logic over;
@@ -26,7 +25,7 @@ always_comb begin
 
     Hsel = 'b0;
     over = 'b0;
-    for (int i = 0; i < NUM_SLAVES; i++) begin
+    for (int i = 0; i < `NUM_SLAVES; i++) begin
             if ((Haddr >= BASE_ADDR[i]) && (Haddr < HIGH_ADDR[i]) && !over) begin
                 Hsel[i] = 1'b1;
                 over = 1'b1;
