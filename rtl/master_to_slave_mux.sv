@@ -9,29 +9,28 @@
 // To derive the DATA ADDRESS and CONTROL SIGNAL on the bus.
 //
 // Author: Muhammad Yousaf and Ali Tahir
-// Date:   29-July-2025
+// Date:   07-August-2025
 
 
-`include "../defines/header.svh"
-import param_pkg::*;
+`include "../defines/parameters.svh"
 
 module master_to_slave_mux (
 
-    input  logic [clog2(NUM_MASTERS)-1:0]          Hmaster,   // Selected master index
-    input  logic [DATA_WIDTH-1:0]                  Haddr_M  [NUM_MASTERS],
-    input  logic [1:0]                             Htrans_M [NUM_MASTERS],
-    input  logic                                   Hwrite_M [NUM_MASTERS],
-    input  logic [2:0]                             Hsize_M  [NUM_MASTERS],
-    input  logic [2:0]                             Hburst_M [NUM_MASTERS],
-    input  logic  [DATA_WIDTH/8-1:0]               Hstrob_M [NUM_MASTERS],
-    input  logic [DATA_WIDTH-1:0]                  Hwdata_M [NUM_MASTERS]
-    output logic [DATA_WIDTH-1:0]                  Haddr,
+    input  logic [$clog2(`NUM_MASTERS)-1:0]        Hmaster,   // Selected master index
+    input  logic [`DATA_WIDTH-1:0]                 Haddr_M  [`NUM_MASTERS],
+    input  logic [1:0]                             Htrans_M [`NUM_MASTERS],
+    input  logic                                   Hwrite_M [`NUM_MASTERS],
+    input  logic [2:0]                             Hsize_M  [`NUM_MASTERS],
+    input  logic [2:0]                             Hburst_M [`NUM_MASTERS],
+    input  logic [`DATA_WIDTH/8-1:0]               Hstrob_M [`NUM_MASTERS],
+    input  logic [`DATA_WIDTH-1:0]                 Hwdata_M [`NUM_MASTERS]
+    output logic [`DATA_WIDTH-1:0]                 Haddr,
     output logic [1:0]                             Htrans,
     output logic                                   Hwrite,
     output logic [2:0]                             Hsize,
     output logic [2:0]                             Hburst,
-    output logic [DATA_WIDTH/8-1:0]                Hstrob,
-    output logic [DATA_WIDTH-1:0]                  Hwdata
+    output logic [`DATA_WIDTH/8-1:0]               Hstrob,
+    output logic [`DATA_WIDTH-1:0]                 Hwdata
 
 );
 
