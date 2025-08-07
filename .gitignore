@@ -1,1 +1,15 @@
 local
+
+makefiles/windows/work
+makefiles/windows/transcript
+makefiles/windows/vsim.wlf
+makefiles/windows/*.log
+makefiles/windows/*.vcd
+makefiles/windows/wlf*
+
+makefiles/linux/work
+makefiles/linux/transcript
+makefiles/linux/vsim.wlf
+makefiles/linux/*.log
+makefiles/linux/*.vcd
+makefiles/linux/wlf*
