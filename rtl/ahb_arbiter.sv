@@ -9,22 +9,21 @@
 // It can handle multiple masters.
 //
 // Author: Muhammad Yousaf and Ali Tahir
-// Date:   29-July-2025
+// Date:   07-August-2025
 
-`include "../defines/header.svh"
-import param_pkg::*;
+`include "../defines/parameters.svh"
 
 module ahb_arbiter (
 
     input  logic                                            Hclk,
     input  logic                                            Hresetn,
-    input  logic [NUM_MASTERS-1:0]                          Hreq,       // Master requests
+    input  logic [`NUM_MASTERS-1:0]                         Hreq,       // Master requests
     input  logic                                            Hready,     // Global Hready
     input  logic [1:0]                                      Htrans,     // Transaction type
     input  logic [2:0]                                      Hburst,     // Burst type
 
-    output logic [NUM_MASTERS-1:0]                          Hgrant,     // Grant signal to masters
-    output logic [clog2(NUM_MASTERS)-1:0]                   Hmaster     // Index of active master
+    output logic [`NUM_MASTERS-1:0]                          Hgrant,     // Grant signal to masters
+    output logic [$clog2(`NUM_MASTERS)-1:0]                  Hmaster     // Index of active master
 
 );
 
@@ -33,9 +32,9 @@ module ahb_arbiter (
     localparam SEQ    = 2'b11;
 
     // === Internal State ===
-    logic [clog2(NUM_MASTERS)-1:0] current_master;
-    logic [clog2(NUM_MASTERS)-1:0] next_master;
-    logic [clog2(NUM_MASTERS)-1:0] granted_master;
+    logic [$clog2(`NUM_MASTERS)-1:0] current_master;
+    logic [$clog2(`NUM_MASTERS)-1:0] next_master;
+    logic [$clog2(`NUM_MASTERS)-1:0] granted_master;
 
     logic [4:0] burst_counter;
     logic       in_burst;
@@ -43,7 +42,7 @@ module ahb_arbiter (
     logic       valid_transfer;
 
     logic ready_for_handover;
-    logic [clog2(NUM_MASTERS)-1:0] idx;
+    logic [$clog2(`NUM_MASTERS)-1:0] idx;
 
     // Burst length decoding
     logic [4:0] burst_len;
@@ -60,10 +59,10 @@ module ahb_arbiter (
     // Round-robin master selection
     always_comb begin
         next_master = current_master;
-        for (int i = 1; i < NUM_MASTERS; i++) begin
-            idx = (current_master + i < NUM_MASTERS) ? (current_master + i) : (current_master + i - NUM_MASTERS);
+        for (int i = 1; i < `NUM_MASTERS; i++) begin
+            idx = (current_master + i < `NUM_MASTERS) ? (current_master + i) : (current_master + i - `NUM_MASTERS);
             if (Hreq[idx])
-                next_master = idx[clog2(NUM_MASTERS)-1:0];
+                next_master = idx[$clog2(`NUM_MASTERS)-1:0];
         end
     end
 
