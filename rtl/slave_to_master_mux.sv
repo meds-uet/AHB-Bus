@@ -9,30 +9,28 @@
 // To derive the DATA and RESPONSE SIGNAL on the bus.
 //
 // Author: Muhammad Yousaf and Ali Tahir
-// Date:   29-July-2025
+// Date:   07-August-2025
 
-`include "../defines/header.svh"
-import param_pkg::*;
-
+`include "../defines/parameters.svh"
 
 module slave_to_master_mux (
 
-    input  logic                            Hclk,
-    input  logic                            Hresetn,
-    input  logic [NUM_SLAVES-1:0]           slave_select,         // One-hot signal from decoder
-    input  logic [clog2(NUM_MASTERS)-1:0]   Hmaster,            // Selected master index
-    input  logic [DATA_WIDTH-1:0]           Hrdata_S [NUM_SLAVES],         // From slaves
-    input  logic [1:0]                      Hresp_S  [NUM_SLAVES],
-    input  logic                            Hreadyout_S [NUM_SLAVES],
-
-    output logic [DATA_WIDTH-1:0]           Hrdata [NUM_MASTERS],
-    output logic [1:0]                      Hresp [NUM_MASTERS],
-    output logic                            Hready                // Global Hready for master
+    input  logic                                Hclk,
+    input  logic                                Hresetn,
+    input  logic [`NUM_SLAVES-1:0]              slave_select,         // One-hot signal from decoder
+    input  logic [$clog2(`NUM_MASTERS)-1:0]     Hmaster,            // Selected master index
+    input  logic [`DATA_WIDTH-1:0]              Hrdata_S [`NUM_SLAVES],         // From slaves
+    input  logic [1:0]                          Hresp_S  [`NUM_SLAVES],
+    input  logic                                Hreadyout_S [`NUM_SLAVES],
+    
+    output logic [`DATA_WIDTH-1:0]              Hrdata [`NUM_MASTERS],
+    output logic [1:0]                          Hresp [`NUM_MASTERS],
+    output logic                                Hready                // Global Hready for master
 );
 
     // Register selected slave (for pipelined response)
-    logic [NUM_SLAVES-1:0] selected_slave;
-    logic [NUM_MASTERS-1:0] selected_master;
+    logic [`NUM_SLAVES-1:0] selected_slave;
+    logic [`NUM_MASTERS-1:0] selected_master;
 
     always_ff @(posedge Hclk or negedge Hresetn) begin
         if (!Hresetn)
@@ -45,7 +43,7 @@ module slave_to_master_mux (
     // Output MUX
     always_comb begin
         case (1'b1)
-        for (int i = 0; i < NUM_SLAVES; i++) begin
+        for (int i = 0; i < `NUM_SLAVES; i++) begin
             selected_slave[i]: begin
                 Hrdata[selected_master] = Hrdata_S[i];
                 Hresp[selected_master]  = Hresp_S[i];
