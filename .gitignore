@@ -1,5 +1,7 @@
 local
 
+makefiles/*
+
 makefiles/windows/work
 makefiles/windows/transcript
 makefiles/windows/vsim.wlf
