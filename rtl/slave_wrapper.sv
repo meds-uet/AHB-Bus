@@ -7,40 +7,39 @@
 // That maps the input and ouput signals to the selected slave.
 //
 // Author: Muhammad Yousaf and Ali Tahir
-// Date:   29-July-2025
+// Date:   09-August-2025
 
 
 
-`include "../defines/header.svh"
-import param_pkg::*;
+`include "../defines/parameters.svh"
 
 module ahb_slave_wrapper (
 
     input  logic                             Hclk,
     input  logic                             Hresetn,
-    input  logic [ADDR_WIDTH-1:0]            Haddr,
+    input  logic [`ADDR_WIDTH-1:0]           Haddr,
     input  logic [1:0]                       Htrans,
     input  logic                             Hwrite,
     input  logic [2:0]                       Hsize,
     input  logic [2:0]                       Hburst,
-    input  logic [DATA_WIDTH-1:0]            HWdata,
-    input  logic [DATA_WIDTH/8-1:0]          Hstrob,
+    input  logic [`DATA_WIDTH-1:0]           HWdata,
+    input  logic [`DATA_WIDTH/8-1:0]         Hstrob,
     input  logic                             Hsel,
     input  logic                             Hready,
-    output logic [DATA_WIDTH-1:0]            HRdata,
+    output logic [`DATA_WIDTH-1:0]           HRdata,
     output logic                             Hreadyout,
     output logic [1:0]                       Hresp
 
 );
 
     // Internal control signals
-    reg [31:0] addr_reg;
+    reg [`ADDR_WIDTH-1:0] addr_reg;
     reg        write_en, read_en;
-    reg [31:0] write_data_reg;
+    reg [`DATA_WIDTH-1:0] write_data_reg;
 
-    wire [31:0] read_data;
+    wire [`DATA_WIDTH-1:0] read_data;
     wire        slave_ready;
-    wire [1:0]  slave_resp;
+    wire [$clog2(`Num_Slaves)-1:0]  slave_resp;
 
     // Transaction phase
     wire trans_valid = Hsel && Hready && (Htrans[1] == 1'b1);
