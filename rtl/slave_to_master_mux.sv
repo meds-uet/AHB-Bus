@@ -9,7 +9,7 @@
 // To derive the DATA and RESPONSE SIGNAL on the bus.
 //
 // Author: Muhammad Yousaf and Ali Tahir
-// Date:   07-August-2025
+// Date:   11-August-2025
 
 `include "../defines/parameters.svh"
 
@@ -17,7 +17,7 @@ module slave_to_master_mux (
 
     input  logic                                Hclk,
     input  logic                                Hresetn,
-    input  logic [`NUM_SLAVES-1:0]              slave_select,         // One-hot signal from decoder
+    input  logic [`NUM_SLAVES-1:0]              Hsel,         // One-hot signal from decoder
     input  logic [$clog2(`NUM_MASTERS)-1:0]     Hmaster,            // Selected master index
     input  logic [`DATA_WIDTH-1:0]              Hrdata_S [`NUM_SLAVES],         // From slaves
     input  logic [1:0]                          Hresp_S  [`NUM_SLAVES],
@@ -25,37 +25,39 @@ module slave_to_master_mux (
     
     output logic [`DATA_WIDTH-1:0]              Hrdata [`NUM_MASTERS],
     output logic [1:0]                          Hresp [`NUM_MASTERS],
-    output logic                                Hready                // Global Hready for master
+    output logic                                Hready               // Global Hready for master
 );
 
     // Register selected slave (for pipelined response)
     logic [`NUM_SLAVES-1:0] selected_slave;
     logic [`NUM_MASTERS-1:0] selected_master;
+    logic over;
 
     always_ff @(posedge Hclk or negedge Hresetn) begin
-        if (!Hresetn)
+        if (!Hresetn) begin
             selected_slave <= 4'b0000;
-        else if (Hready) // Only update on valid transfer complete
-            selected_slave <= slave_select;
+        end 
+        else if (Hready) begin // Only update on valid transfer complete
+            selected_slave <= Hsel;
             selected_master <= Hmaster;
+        end
     end
 
-    // Output MUX
     always_comb begin
-        case (1'b1)
-        for (int i = 0; i < `NUM_SLAVES; i++) begin
-            selected_slave[i]: begin
+        over = 1'b0;
+        for (int i = 0; i < `NUM_MASTERS; i++) begin
+            if (selected_slave[i] == 1'b1 && !over) begin
                 Hrdata[selected_master] = Hrdata_S[i];
                 Hresp[selected_master]  = Hresp_S[i];
-                Hready[selected_master] = Hreadyout_S[i];
+                Hready = Hreadyout_S[i];
+                over = 1'b1;
             end
         end
-            default: begin
-                Hrdata[selected_master] = 32'hDEADBEEF;
-                Hresp[selected_master]  = 2'b00;
-                Hready[selected_master] = 1'b1; // default: no wait
-            end
-        endcase
+        if (!over) begin
+            Hrdata[selected_master] = 32'hDEADBEEF;
+            Hresp[selected_master]  = 2'b00;
+            Hready = 1'b1;
+        end
     end
 
 endmodule
