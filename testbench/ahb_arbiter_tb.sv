@@ -52,7 +52,7 @@ module ahb_arbiter_tb;
 
         @(posedge Hclk);
         Htrans = 2'b10;
-        Hburst = 3'b001;
+        Hburst = 3'b000;
 
         repeat (1) @(posedge Hclk);
         
