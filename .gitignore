@@ -1,6 +1,6 @@
 local
 
-makefiles/*
+makefiles/windows/*
 
 makefiles/windows/work
 makefiles/windows/transcript
