@@ -13,6 +13,8 @@
 
 `include "../defines/parameters.svh"
 
+localparam MASTER_WIDTH = (`NUM_MASTERS > 1) ? $clog2(`NUM_MASTERS) : 1;
+
 module ahb_arbiter (
 
     input  logic                                            Hclk,
@@ -22,8 +24,8 @@ module ahb_arbiter (
     input  logic [1:0]                                      Htrans,     // Transaction type
     input  logic [2:0]                                      Hburst,     // Burst type
 
-    output logic [`NUM_MASTERS-1:0]                          Hgrant,     // Grant signal to masters
-    output logic [$clog2(`NUM_MASTERS)-1:0]                  Hmaster     // Index of active master
+    output logic [`NUM_MASTERS-1:0]                         Hgrant,     // Grant signal to masters
+    output logic [MASTER_WIDTH-1:0]                         Hmaster     // Index of active master
 
 );
 
@@ -32,17 +34,18 @@ module ahb_arbiter (
     localparam SEQ    = 2'b11;
 
     // === Internal State ===
-    logic [$clog2(`NUM_MASTERS)-1:0] current_master;
-    logic [$clog2(`NUM_MASTERS)-1:0] next_master;
-    logic [$clog2(`NUM_MASTERS)-1:0] granted_master;
+    logic [MASTER_WIDTH-1:0] current_master;
+    logic [MASTER_WIDTH-1:0] next_master;
+    logic [MASTER_WIDTH-1:0] granted_master;
 
     logic [4:0] burst_counter;
     logic       in_burst;
     logic       is_incr;
     logic       valid_transfer;
+    logic over;
 
     logic ready_for_handover;
-    logic [$clog2(`NUM_MASTERS)-1:0] idx;
+    logic [MASTER_WIDTH-1:0] idx;
 
     // Burst length decoding
     logic [4:0] burst_len;
@@ -58,11 +61,13 @@ module ahb_arbiter (
 
     // Round-robin master selection
     always_comb begin
+        over = 1'b0;
         next_master = current_master;
         for (int i = 1; i < `NUM_MASTERS; i++) begin
             idx = (current_master + i < `NUM_MASTERS) ? (current_master + i) : (current_master + i - `NUM_MASTERS);
-            if (Hreq[idx])
-                next_master = idx[$clog2(`NUM_MASTERS)-1:0];
+            if (Hreq[idx] && !over)
+                next_master = idx[MASTER_WIDTH-1:0];
+                over = 1'b1;
         end
     end
 
