@@ -15,6 +15,9 @@
 `define DATA_WIDTH 32
 `define ADDR_WIDTH 32
 
+`define MASTER_WIDTH (`NUM_MASTERS > 1) ? $clog2(`NUM_MASTERS) : 1
+`define SLAVE_WIDTH (`NUM_SLAVES > 1) ? $clog2(`NUM_SLAVES) : 1
+
 // Do not forget to match the address range with the NUM_SLAVES
 
 localparam [`ADDR_WIDTH-1:0] BASE_ADDR [0:`NUM_SLAVES-1] = '{

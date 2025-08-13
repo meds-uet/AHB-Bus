@@ -16,7 +16,7 @@
 
 module master_to_slave_mux (
 
-    input  logic [$clog2(`NUM_MASTERS)-1:0]        Hmaster,   // Selected master index
+    input  logic [`MASTER_WIDTH-1:0]               Hmaster,   // Selected master index
     input  logic [`DATA_WIDTH-1:0]                 Haddr_M  [`NUM_MASTERS],
     input  logic [1:0]                             Htrans_M [`NUM_MASTERS],
     input  logic                                   Hwrite_M [`NUM_MASTERS],

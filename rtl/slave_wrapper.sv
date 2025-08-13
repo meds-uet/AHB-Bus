@@ -34,12 +34,12 @@ module ahb_slave_wrapper (
 
     // Internal control signals
     reg [`ADDR_WIDTH-1:0] addr_reg;
-    reg        write_en, read_en;
+    reg                   write_en, read_en;
     reg [`DATA_WIDTH-1:0] write_data_reg;
 
     wire [`DATA_WIDTH-1:0] read_data;
-    wire        slave_ready;
-    wire [$clog2(`Num_Slaves)-1:0]  slave_resp;
+    wire                   slave_ready;
+    wire [`SLAVE_WIDTH-1:0]  slave_resp;
 
     // Transaction phase
     wire trans_valid = Hsel && Hready && (Htrans[1] == 1'b1);

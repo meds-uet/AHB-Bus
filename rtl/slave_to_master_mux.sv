@@ -18,7 +18,7 @@ module slave_to_master_mux (
     input  logic                                Hclk,
     input  logic                                Hresetn,
     input  logic [`NUM_SLAVES-1:0]              Hsel,         // One-hot signal from decoder
-    input  logic [$clog2(`NUM_MASTERS)-1:0]     Hmaster,            // Selected master index
+    input  logic [`MASTER_WIDTH-1:0]            Hmaster,            // Selected master index
     input  logic [`DATA_WIDTH-1:0]              Hrdata_S [`NUM_SLAVES],         // From slaves
     input  logic [1:0]                          Hresp_S  [`NUM_SLAVES],
     input  logic                                Hreadyout_S [`NUM_SLAVES],
@@ -44,8 +44,14 @@ module slave_to_master_mux (
     end
 
     always_comb begin
+        // Default Assignments 
+        for (int m = 0; m < `NUM_MASTERS; m++) begin
+            Hrdata[m] = 32'hDEADBEEF;
+            Hresp[m]  = 2'b00;
+        end
         over = 1'b0;
-        for (int i = 0; i < `NUM_MASTERS; i++) begin
+        Hready = 1'b1;
+        for (int i = 0; i < `NUM_SLAVES; i++) begin
             if (selected_slave[i] == 1'b1 && !over) begin
                 Hrdata[selected_master] = Hrdata_S[i];
                 Hresp[selected_master]  = Hresp_S[i];
