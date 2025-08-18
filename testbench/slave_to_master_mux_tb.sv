@@ -1,3 +1,15 @@
+// Copyright 2025 Maktab-e-Digital Systems Lahore.
+// Licensed under the Apache License, Version 2.0, see LICENSE file for details.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Description: 
+// 
+// This module tests the slave to master multiplexer for the AHB bus.
+//
+//
+// Author: Muhammad Yousaf and Ali Tahir
+// Date:   11-August-2025
+
 `timescale 1ns/1ps
 `include "../defines/parameters.svh"  // Make sure this defines NUM_SLAVES, NUM_MASTERS, DATA_WIDTH
 
