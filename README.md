@@ -8,6 +8,9 @@
 
 ---
 
+# BLOCK DIAGRAM  
+![Design Diagram](docs/image_design/ahb_protocol-Design.jpg)
+
 # Clone the Repository 
 
 Clone the repository using this
