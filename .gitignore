@@ -17,3 +17,4 @@ makefiles/linux/vsim.wlf
 makefiles/linux/*.log
 makefiles/linux/*.vcd
 makefiles/linux/wlf*
+.DS_Store

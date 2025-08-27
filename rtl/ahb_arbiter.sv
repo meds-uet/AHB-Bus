@@ -102,9 +102,7 @@ module ahb_arbiter (
         end else begin
                 
             current_master <= granted_master;
-
-            // valid_transfer = Hready && (Htrans == NONSEQ || Htrans == SEQ);
-
+            
             // Start of burst
             if (!in_burst && valid_transfer && Hreq[current_master]) begin
                 in_burst      <= 1;
