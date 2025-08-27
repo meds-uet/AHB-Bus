@@ -31,7 +31,6 @@ module slave_to_master_mux (
     // Register selected slave (for pipelined response)
     logic [`NUM_SLAVES-1:0] selected_slave;
     logic [`NUM_MASTERS-1:0] selected_master;
-    logic over;
 
     always_ff @(posedge Hclk or negedge Hresetn) begin
         if (!Hresetn) begin
@@ -45,25 +44,11 @@ module slave_to_master_mux (
 
     always_comb begin
         // Default Assignments 
-        for (int m = 0; m < `NUM_MASTERS; m++) begin
-            Hrdata[m] = 32'hDEADBEEF;
-            Hresp[m]  = 2'b00;
-        end
-        over = 1'b0;
         Hready = 1'b1;
-        for (int i = 0; i < `NUM_SLAVES; i++) begin
-            if (selected_slave[i] == 1'b1 && !over) begin
-                Hrdata[selected_master] = Hrdata_S[i];
-                Hresp[selected_master]  = Hresp_S[i];
-                Hready = Hreadyout_S[i];
-                over = 1'b1;
-            end
-        end
-        if (!over) begin
-            Hrdata[selected_master] = 32'hDEADBEEF;
-            Hresp[selected_master]  = 2'b00;
-            Hready = 1'b1;
-        end
+
+        Hrdata[selected_master] = Hrdata_S[selected_slave];
+        Hresp[selected_master]  = Hresp_S[selected_slave];
+        Hready = Hreadyout_S[selected_slave];
     end
 
 endmodule
