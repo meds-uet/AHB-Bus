@@ -129,22 +129,35 @@ You can easily configure the **number of masters and slaves** for the AHB Bus by
     `define NUM_MASTERS 2
     `define NUM_SLAVES 4
     ```
-3. Modify these values as per your design requirements.
-For example, to configure 3 masters and 5 slaves:
-    ```systemverilog
-    `define NUM_MASTERS 3
-    `define NUM_SLAVES 5
-    ```
-4. Save the file and rerun the simulation using the provided makefiles.
 
-# Documentation
+# AHB Bus (AMBA AHB) — SystemVerilog IP
 
-- [Documentation](https://ahb-bus-protocol.readthedocs.io/en/latest/)
+![AHB Diagram](docs/image_design/ahb_protocol-Design.jpg)
 
-# Licensing
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Documentation](https://readthedocs.org/projects/ahb-bus-protocol/badge/)](https://ahb-bus-protocol.readthedocs.io/)
 
-Licensed under the **Apache License 2.0**
-Copyright © 2025
-**[Maktab-e-Digital Systems Lahore](https://github.com/meds-uet)**
+A compact, parameterized SystemVerilog implementation of an AMBA AHB interconnect (arbiter, decoders, master/slave wrappers and muxes) intended for academic and verification use.
 
----
+Key features
+- Macro-driven configuration (`defines/parameters.svh`) to choose numbers of masters/slaves and widths
+- Clear RTL ↔ testbench pairing (`rtl/*.sv` and `testbench/*_tb.sv`)
+- Example designs and diagrams under `docs/image_design/`
+
+Quick start (minimal)
+```bash
+git clone https://github.com/meds-uet/AHB-Bus.git
+cd AHB-Bus/makefiles/linux
+make        # launches ModelSim/Questa and runs the default testbench (Linux)
+```
+
+Windows users: use `makefiles/windows/run.bat` or open `makefiles/windows/run.do` in Questa/ModelSim.
+
+Full documentation
+All detailed documentation (installation, theory, user & developer guides, API pages) is maintained in ReadTheDocs:
+
+https://ahb-bus-protocol.readthedocs.io/
+
+For developer notes, simulation flows, and diagrams see the `docs/` folder in this repo.
+
+License: Apache-2.0

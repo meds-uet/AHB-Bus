@@ -18,3 +18,6 @@ makefiles/linux/*.log
 makefiles/linux/*.vcd
 makefiles/linux/wlf*
 .DS_Store
+
+.github
+site/

@@ -1,3 +1,22 @@
+---
+title: AHB Bus Documentation
+---
+
+# AHB Bus — Documentation
+
+This documentation contains the full manual for the AHB Bus SystemVerilog IP: installation, theory, user and developer guides, API reference, and contribution instructions.
+
+Quick links
+- [Installation](installation.md)
+- [Theory of Operation](theory.md)
+- [User Guide](user_guide.md)
+- [Developer Guide](developer_guide.md)
+- [API Reference](api_reference.md)
+- [Contributing](contributing.md)
+
+Front page content
+
+Refer to the repository's README for a short project summary and quick start instructions. Diagrams are in `docs/image_design/`.
 # AMBA AHB BUS PROTOCOL
 
 > **Hardware AHB BUS (SystemVerilog Implementation)**
@@ -31,94 +50,48 @@ The AMBA Advanced High-performance Bus (AHB) is a bus protocol introduced by ARM
 
 
 
+
 ## Main Features of AHB Bus Protocol
 
-The AHB Protocol Features that are supported are given as follow :
+The AHB Protocol features supported here include:
 
-
-### ✅ 1. Single Clock Edge Operation
-- All operations are synchronized to the **rising edge** of a single system clock.
-
+### 1. Single Clock Edge Operation
+- All operations are synchronized to the rising edge of a single system clock.
 - Simplifies timing analysis and enhances performance.
 
----
-
-### 🚀 2. Burst Transfers
-- Supports **burst types**: `SINGLE`, `INCR`, `WRAP4`, `INCR4`, `INCR8`, `INCR16`, etc.
-
+### 2. Burst Transfers
+- Supports burst types: `SINGLE`, `INCR`, `WRAP4`, `INCR4`, `INCR8`, `INCR16`, etc.
 - Improves efficiency by reducing address/control overhead during sequential data transfers.
 
----
-
-### 🔁 3. Pipelined Operation
-- AHB supports pipelining with separate **address phase** and **data phase**.
-
+### 3. Pipelined Operation
+- AHB supports pipelining with separate address and data phases.
 - Enables a new transfer to begin before the previous one completes.
 
-- Improves throughput significantly.
+### 4. Multi-Master Support
+- Supports multiple bus masters like CPU, DMA, etc. Only one master drives the bus at a time.
 
----
+### 5. Address and Data Bus Multiplexing
+- AHB uses shared lines for address and data to reduce pin count.
 
-### 📥 4. Multi-Master Support
-- Supports multiple bus masters like CPU, DMA, etc.
+### 6. 32-bit or 64-bit Data Bus
+- Data bus is typically 32-bit wide but can be extended to 64-bit.
 
-- Masters use an **arbitration mechanism** (external to AHB) to gain control of the bus.
+### 7. Error Reporting via HRESP
+- `HRESP` returns `OKAY` (normal) or `ERROR` (error occurred).
 
-- Only one master can drive the bus at any time.
+### 8. External Arbitration Logic
+- Arbitration between masters is handled outside the AHB bus (e.g., round-robin or fixed-priority).
 
----
+### 9. Transfer Types
+- `IDLE`, `BUSY`, `NONSEQ`, `SEQ`
 
-### 🔀 5. Address and Data Bus Multiplexing
-- AHB uses shared lines for address and data (i.e., bus multiplexing).
+### 10. Handshaking Between Master and Slave
+- `HREADY` and `HRESP` coordinate transfers.
 
-- Reduces the number of physical signals/pins.
-
----
-
-### 📦 6. 32-bit or 64-bit Data Bus
-- Data bus is typically **32-bit wide**, but can also be extended to **64 bits** or more for higher performance.
-
----
-
-### ❗ 7. Error Reporting via HRESP
-The `HRESP` signal returns response status:
-
-  - `OKAY` – Normal transfer
-  - `ERROR` – Error occurred
-
----
-
-### 🧠 8. External Arbitration Logic
-- Arbitration between masters is handled **outside** the AHB bus.
-
-- Common schemes: fixed-priority, round-robin, or custom.
-
----
-
-### 📶 9. Transfer Types
-
-- **IDLE** – No transfer
-- **BUSY** – Pipeline stall (no address phase)
-- **NONSEQ** – Start of a new transfer or burst
-- **SEQ** – Sequential transfer within a burst
-
----
-
-### 🎯 10. Handshaking Between Master and Slave
-- `HREADY` and `HRESP` signals coordinate data transfers.
-
-- Master waits if slave is not ready.
-
----
-
-### 📋 11. Memory-Mapped Support
-- AHB is designed for **memory-mapped peripheral access**.
-
+### 11. Memory-Mapped Support
 - Each device is assigned a specific address region.
 
----
-
-## 📊 Summary Table
+## Summary Table
 
 | Feature              | Description                                      |
 |----------------------|--------------------------------------------------|
@@ -127,7 +100,7 @@ The `HRESP` signal returns response status:
 | Arbitration          | External (master-side)                           |
 | Bus width            | 32 or 64 bits                                    |
 | Multi-master support | Yes                                              |
-| Response types       | OKAY, ERROR,                        |
+| Response types       | OKAY, ERROR                                      |
 | Transfer types       | IDLE, BUSY, NONSEQ, SEQ                          |
 | Handshaking          | HREADY and HRESP                                 |
 | Clocking             | Single rising-edge clock                         |
